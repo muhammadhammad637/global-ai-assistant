@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; background: transparent; color: #dbeafe; font: 14px system-ui, sans-serif; }
+    button { border: 1px solid #64748b; border-radius: 11px; padding: 8px 13px;
+      background: rgba(23,37,84,.88); color: white; cursor: pointer; font-weight: 600; }
+    button:hover { border-color: #38bdf8; }
+    #status { margin-left: 9px; color: #bfdbfe; }
+  </style>
+</head>
+<body>
+  <button id="listen" type="button">🎙️ Voice input</button><span id="status" aria-live="polite"></span>
+  <script>
+    const button = document.getElementById("listen");
+    const status = document.getElementById("status");
+    let speechLanguage = "en-US";
+
+    function sendValue(value) {
+      window.parent.postMessage({
+        isStreamlitMessage: true,
+        type: "streamlit:setComponentValue",
+        value,
+        dataType: "json"
+      }, "*");
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "streamlit:render") {
+        const args = event.data.args || {};
+        button.textContent = `🎙️ ${args.label || "Voice input"}`;
+        speechLanguage = args.language || "en-US";
+      }
+    });
+
+    window.parent.postMessage({
+      isStreamlitMessage: true,
+      type: "streamlit:componentReady",
+      apiVersion: 1
+    }, "*");
+
+    button.addEventListener("click", () => {
+      const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) {
+        status.textContent = "Speech recognition is not supported in this browser.";
+        return;
+      }
+      const recognition = new Recognition();
+      recognition.lang = speechLanguage;
+      recognition.onstart = () => { status.textContent = "Listening…"; };
+      recognition.onerror = (event) => { status.textContent = `Voice input error: ${event.error}`; };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        sendValue({ transcript, nonce: Date.now() });
+        status.textContent = "Captured. Press Send to ask.";
+      };
+      recognition.start();
+    });
+  </script>
+</body>
+</html>
