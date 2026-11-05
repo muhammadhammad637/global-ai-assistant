@@ -18,6 +18,17 @@ import streamlit as st
 import streamlit.components.v1 as components
 from PIL import Image, UnidentifiedImageError
 
+
+def configured_value(name, default=""):
+    value = os.environ.get(name)
+    if value is not None:
+        return value
+    try:
+        return st.secrets.get(name, default)
+    except (FileNotFoundError, AttributeError):
+        return default
+
+
 try:
     from .chatbot import FAQBot
     from .capability_catalog import (
@@ -182,7 +193,7 @@ def admin_password():
             configured = st.secrets.get("admin", {}).get("admin_password", "")
     except (FileNotFoundError, AttributeError):
         configured = ""
-    return configured or os.environ.get("GLOBAL_ASSISTANT_ADMIN_PASSWORD", "")
+    return configured or configured_value("GLOBAL_ASSISTANT_ADMIN_PASSWORD", "")
 
 
 def verify_admin(password):
@@ -209,7 +220,7 @@ def save_admin_password(password):
 
 
 def online_translate(text, target):
-    api_key = os.environ.get("GOOGLE_TRANSLATE_API_KEY", "")
+    api_key = configured_value("GOOGLE_TRANSLATE_API_KEY", "")
     if not api_key or target not in {"en", "ur", "hi"}:
         return text
     payload = urllib.parse.urlencode({"q": text, "target": target, "format": "text"}).encode("utf-8")
@@ -423,7 +434,7 @@ def render_media_studio():
         st.write("Voice input uses your browser speech-recognition engine; answers can be read aloud using browser speech synthesis.")
         st.caption("Microphone permissions and supported languages depend on your browser. Speech may be processed by that browser's recognition provider.")
         speech_controls(st.session_state.get("language", "en"))
-        tts_key = os.environ.get("OPENAI_API_KEY", "")
+        tts_key = configured_value("OPENAI_API_KEY", "")
         if not tts_key:
             st.info("Browser voice input and read-aloud work without an API key. Downloadable MP3 generation needs OPENAI_API_KEY.")
         speech_text = st.text_area("Text to turn into a downloadable voice clip", max_chars=4000)
@@ -448,7 +459,7 @@ def render_media_studio():
     with tab_image:
         st.write("Image generation calls OpenAI's image API only after you explicitly submit a prompt.")
         st.warning("Generation may incur provider charges. Do not include private or sensitive information in prompts.")
-        api_key = os.environ.get("OPENAI_API_KEY", "")
+        api_key = configured_value("OPENAI_API_KEY", "")
         if not api_key:
             st.info("Set OPENAI_API_KEY in the environment and restart the app to enable image generation.")
         image_prompt = st.text_area("Describe the image", max_chars=1000, key="image_prompt")
@@ -493,7 +504,7 @@ def render_media_studio():
     with tab_video:
         st.write("Runway Gen-4.5 text-to-video. Jobs are asynchronous and charged according to your Runway account.")
         st.warning("Prompts are sent to Runway. Do not submit private data or content you do not have rights to use.")
-        runway_key = os.environ.get("RUNWAYML_API_SECRET", "") or os.environ.get("RUNWAY_API_KEY", "")
+        runway_key = configured_value("RUNWAYML_API_SECRET", "") or configured_value("RUNWAY_API_KEY", "")
         if not runway_key:
             st.info("Set RUNWAYML_API_SECRET in your environment, then restart the app to enable video generation.")
         video_prompt = st.text_area("Describe the video", max_chars=1000, key="video_prompt")
@@ -528,7 +539,7 @@ def render_media_studio():
 
 
 def run_tool_ai(task, context=""):
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    api_key = configured_value("OPENAI_API_KEY", "")
     if not api_key:
         st.info("This AI tool needs OPENAI_API_KEY. The offline calculator, unit converter, and date planner work without it.")
         return
@@ -547,7 +558,7 @@ def render_tools_workspace():
         '<p>Study, documents, practical calculations, and writing help.</p></div>',
         unsafe_allow_html=True,
     )
-    api_key = os.environ.get("OPENAI_API_KEY", "")
+    api_key = configured_value("OPENAI_API_KEY", "")
     if api_key:
         st.caption("AI requests are sent to OpenAI only when you press a generate button. Review results before relying on them.")
     else:
@@ -767,9 +778,9 @@ def render_instagram_workspace():
         unsafe_allow_html=True,
     )
     st.caption("This integration requests basic profile and insights access only; it cannot publish posts or manage comments or messages.")
-    client_id = os.environ.get("INSTAGRAM_APP_ID", "").strip()
-    client_secret = os.environ.get("INSTAGRAM_APP_SECRET", "").strip()
-    redirect_uri = os.environ.get("INSTAGRAM_REDIRECT_URI", "").strip()
+    client_id = configured_value("INSTAGRAM_APP_ID", "").strip()
+    client_secret = configured_value("INSTAGRAM_APP_SECRET", "").strip()
+    redirect_uri = configured_value("INSTAGRAM_REDIRECT_URI", "").strip()
     if not client_id or not client_secret or not redirect_uri:
         st.info(
             "Configure INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET, and "
@@ -1182,7 +1193,7 @@ st.markdown(
 )
 st.markdown(picture_carousel_css(), unsafe_allow_html=True)
 
-api_available = bool(os.environ.get("GOOGLE_TRANSLATE_API_KEY"))
+api_available = bool(configured_value("GOOGLE_TRANSLATE_API_KEY"))
 online_mode = False
 if api_available:
     online_mode = st.sidebar.toggle(tr("online", language), value=False)
@@ -1191,7 +1202,7 @@ if api_available:
 else:
     st.sidebar.caption(tr("offline_note", language))
 
-model_api_key = os.environ.get("OPENAI_API_KEY", "")
+model_api_key = configured_value("OPENAI_API_KEY", "")
 online_ai = False
 if model_api_key:
     online_ai = st.sidebar.toggle(
