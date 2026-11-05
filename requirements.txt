@@ -1,0 +1,7 @@
+scikit-learn
+numpy
+scipy
+streamlit
+pypdf
+python-docx
+psycopg[binary]
