@@ -29,7 +29,7 @@ streamlit run app.py
 - Voice input requires browser speech-recognition support and microphone permission.
 - Voice output uses the browser's built-in speech synthesis.
 - Creation Studio includes voice input/read-aloud and downloadable text-to-speech. Downloadable MP3 generation requires `OPENAI_API_KEY`.
-- The sidebar's module catalog contains 10,000 searchable prompt templates across 25 categories, generated from 200 topics, five audiences, and ten action frameworks. These are question templates, not 1,000 separate AI models or provider integrations.
+- The sidebar's module catalog contains 10,000 searchable prompt templates across 25 categories, generated from 200 topics, five audiences, and ten action frameworks. These are question templates, not 10,000 separate AI models or provider integrations.
 - **Everyday tools** adds four working modules: study summaries/quizzes/flashcards; PDF, DOCX, and text-document summaries/Q&A; offline arithmetic, unit conversion, and date planning; and AI-assisted email, resume, and social-caption drafts. AI-assisted modules require `OPENAI_API_KEY`; uploaded notes/documents are sent to OpenAI only after submission. Scanned PDFs need OCR and are not supported.
 
 ## Sign-in and media
@@ -43,7 +43,7 @@ streamlit run app.py
 - The Instagram insights workspace supports read-only connections to Instagram Professional (Business/Creator) accounts. It uses Meta's Instagram Login and needs `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, and `INSTAGRAM_REDIRECT_URI`. Tokens are kept in the current app session and are not saved to the project database. Only the `instagram_business_basic` and `instagram_business_manage_insights` permissions are requested; posting, comments, and messages are not enabled.
 - The chat accepts a catalog of 100+ file extensions, limited to five files of up to 10 MB each. Common text files and images are read locally; other file types are listed/uploadable but their contents are not extracted. Uploaded files are not persisted.
 - Projects and agent guidance are stored in the local SQLite database. Agent instructions are applied only in online AI mode.
-- The sidebar's module catalog contains 10,000 searchable prompt templates across 25 categories, generated from 200 topics, five audiences, and ten action frameworks. These are question templates, not 1,000 separate AI models or provider integrations.
+- The sidebar's module catalog contains 10,000 searchable prompt templates across 25 categories, generated from 200 topics, five audiences, and ten action frameworks. These are question templates, not 10,000 separate AI models or provider integrations.
 - All 120 local SVG backgrounds rotate automatically behind the chat UI on a 12-minute loop; each scene remains for about six seconds. The selected neon palette adds ambient light reflections.
 - Do not collect OTP codes yourself; use the configured identity provider's supported MFA flow.
 - Video input is text-to-video; image-to-video and other video vendors are not connected.
