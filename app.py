@@ -44,6 +44,7 @@ try:
         catalog_csv as capability_csv,
     )
     from .module_catalog import CATEGORIES, build_catalog, catalog_csv
+    from .kiwi_provider import answer_question as kiwi_answer_question
     from . import storage
     from .media_providers import (
         generate_speech,
@@ -69,6 +70,7 @@ except ImportError:
         catalog_csv as capability_csv,
     )
     from module_catalog import CATEGORIES, build_catalog, catalog_csv
+    from kiwi_provider import answer_question as kiwi_answer_question
     import storage
     from media_providers import (
         generate_speech,
@@ -1203,17 +1205,37 @@ else:
     st.sidebar.caption(tr("offline_note", language))
 
 model_api_key = configured_value("OPENAI_API_KEY", "")
-online_ai = False
+kiwi_api_key = configured_value("KIWI_API_KEY", "")
+ai_provider_options = []
 if model_api_key:
+    ai_provider_options.append(("openai", "OpenAI"))
+if kiwi_api_key:
+    ai_provider_options.append(("kiwi", "Kiwi AI"))
+
+online_ai = False
+selected_ai_provider = None
+if ai_provider_options:
+    if len(ai_provider_options) > 1:
+        selected_ai_provider = st.sidebar.selectbox(
+            "AI provider",
+            ai_provider_options,
+            format_func=lambda item: item[1],
+            key="ai_provider",
+        )[0]
+    else:
+        selected_ai_provider = ai_provider_options[0][0]
+    provider_name = "Kiwi AI (LLM.kiwi)" if selected_ai_provider == "kiwi" else "OpenAI"
     online_ai = st.sidebar.toggle(
-        "Use online AI (sends your prompts to OpenAI)",
+        f"Use online AI (sends prompts to {provider_name})",
         value=False,
         key="online_ai",
     )
+    if online_ai and selected_ai_provider == "kiwi":
+        st.sidebar.info("Your prompt and recent chat context are sent to LLM.kiwi for an answer.")
 else:
     st.sidebar.info(
-        "Offline mode answers built-in FAQs only, so it may not know general questions. "
-        "Configure OPENAI_API_KEY to enable the optional 'Use online AI' chat mode."
+        "Offline mode answers built-in FAQs only. Configure OPENAI_API_KEY or "
+        "KIWI_API_KEY in the server secrets to enable online AI."
     )
 
 project_id = st.session_state.get("active_project_id")
@@ -1436,18 +1458,32 @@ if st.button(tr("send", language), type="primary") and prompt.strip():
         tag, confidence = f"custom_faq:{custom['category']}", 1.0
     elif online_ai:
         selected_agent = st.session_state.get("active_agent")
+        agent_instructions = selected_agent["instructions"] if selected_agent else None
+        history = st.session_state.messages[:-1]
+        file_context = "\n\n".join(file_context_parts)
         try:
-            answer = online_answer(
-                model_text,
-                model_api_key,
-                st.session_state.messages[:-1],
-                selected_agent["instructions"] if selected_agent else None,
-                "\n\n".join(file_context_parts),
-            )
+            if selected_ai_provider == "kiwi":
+                answer = kiwi_answer_question(
+                    model_text,
+                    kiwi_api_key,
+                    history,
+                    agent=agent_instructions,
+                    file_context=file_context,
+                )
+                tag = "kiwi_ai"
+            else:
+                answer = online_answer(
+                    model_text,
+                    model_api_key,
+                    history,
+                    agent_instructions,
+                    file_context,
+                )
+                tag = "online_ai"
         except RuntimeError as error:
             st.error(str(error))
             st.stop()
-        tag, confidence = "online_ai", 1.0
+        confidence = 1.0
     else:
         answer = bot.reply(model_text)
         tag, confidence = bot.predict(model_text)
