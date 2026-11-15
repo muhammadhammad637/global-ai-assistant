@@ -1469,6 +1469,7 @@ if st.button(tr("send", language), type="primary") and prompt.strip():
                     history,
                     agent=agent_instructions,
                     file_context=file_context,
+                    model=configured_value("KIWI_API_MODEL", "auto"),
                 )
                 tag = "kiwi_ai"
             else:
