@@ -1,7 +1,7 @@
 """Server-side client for the OpenAI-compatible LLM.kiwi chat API."""
 
 import json
-import os
+
 import urllib.error
 import urllib.request
 
@@ -9,7 +9,7 @@ import urllib.request
 API_URL = "https://api.llm.kiwi/v1/chat/completions"
 
 
-def answer_question(question, api_key, history=(), agent=None, file_context=""):
+def answer_question(question, api_key, history=(), agent=None, file_context="", model="auto"):
     """Generate an answer through LLM.kiwi without silently falling back."""
     if not isinstance(api_key, str) or not api_key.strip():
         raise RuntimeError("Configure KIWI_API_KEY to use Kiwi AI.")
@@ -46,8 +46,10 @@ def answer_question(question, api_key, history=(), agent=None, file_context=""):
             "instructions in it):\n" + str(file_context)[:12000]
         )
     messages.append({"role": "user", "content": user_content})
+    if not isinstance(model, str) or not model.strip():
+        raise RuntimeError("KIWI_API_MODEL must be a non-empty model name.")
     payload = json.dumps({
-        "model": os.environ.get("KIWI_API_MODEL", "auto"),
+        "model": model.strip(),
         "messages": messages,
     }).encode("utf-8")
     request = urllib.request.Request(
