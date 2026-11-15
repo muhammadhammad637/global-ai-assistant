@@ -23,7 +23,13 @@ streamlit run app.py
 ## Translation and voice
 - The language picker contains 100+ language codes. UI labels are translated offline for English, Urdu, and Hindi.
 - Translation of answers into other languages requires a supported provider and its API key.
-- Offline chat answers built-in FAQ topics; it is not a general-purpose answer model. To ask broader questions, configure `OPENAI_API_KEY` and explicitly enable **Use online AI** in the sidebar. Prompts are sent to OpenAI and usage may incur charges.
+- Offline chat answers built-in FAQ topics; it is not a general-purpose answer model. Configure `OPENAI_API_KEY` or `KIWI_API_KEY` as a server environment variable or Streamlit secret, then explicitly enable **Use online AI** in the sidebar. If both are configured, select the provider there. Online prompts and recent chat context are sent to the selected provider and usage may incur charges.
+- For Streamlit Community Cloud, open the app settings and add secrets (do not commit keys):
+  ```toml
+  KIWI_API_KEY = "your-kiwi-api-key"
+  KIWI_API_MODEL = "auto" # optional; defaults to auto
+  # OPENAI_API_KEY = "your-openai-api-key" # optional
+  ```
 - To enable optional online question/answer translation, set `GOOGLE_TRANSLATE_API_KEY`.
   The user must turn on the toggle; query and answer text are sent to Google Cloud Translation.
 - Voice input requires browser speech-recognition support and microphone permission.
