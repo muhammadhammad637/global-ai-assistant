@@ -92,7 +92,7 @@ TRANSLATIONS = {
         "chat": "Chat", "admin": "Admin", "language": "Language", "english": "English",
         "urdu": "Urdu", "hindi": "Hindi", "question": "Ask anything...", "send": "Send",
         "voice": "Voice input", "speak": "Read answers aloud", "categories": "Explore categories",
-        "catalog": "Review 1,000 proposed modules", "welcome": "Hello! Choose a category or ask me about work, study, health, travel, money, and more.",
+        "catalog": "Review 10,000 prompt templates", "welcome": "Hello! Choose a category or ask me about work, study, health, travel, money, and more.",
         "history": "Conversation history", "clear": "Clear my history", "online": "Translate answers online",
         "privacy": "Online translation sends your question and answer to Google Cloud Translation.",
         "offline_note": "Offline mode keeps text on this machine; some answers may remain in English.",
@@ -102,7 +102,7 @@ TRANSLATIONS = {
         "chat": "گفتگو", "admin": "ایڈمن", "language": "زبان", "english": "انگریزی",
         "urdu": "اردو", "hindi": "ہندی", "question": "اپنا سوال لکھیں...", "send": "بھیجیں",
         "voice": "آواز سے سوال", "speak": "جواب آواز میں سنائیں", "categories": "موضوعات دیکھیں",
-        "catalog": "1000 مجوزہ ماڈیولز دیکھیں", "welcome": "السلام علیکم! کسی موضوع کا انتخاب کریں یا کام، تعلیم، صحت، سفر اور دیگر امور کے بارے میں پوچھیں۔",
+        "catalog": "10,000 مجوزہ پرامپٹس دیکھیں", "welcome": "السلام علیکم! کسی موضوع کا انتخاب کریں یا کام، تعلیم، صحت، سفر اور دیگر امور کے بارے میں پوچھیں۔",
         "history": "گفتگو کی تاریخ", "clear": "میری گفتگو صاف کریں", "online": "آن لائن ترجمہ",
         "privacy": "آن لائن ترجمہ آپ کا سوال اور جواب Google Cloud Translation کو بھیجتا ہے۔",
         "offline_note": "آف لائن موڈ متن اسی کمپیوٹر پر رکھتا ہے؛ کچھ جوابات انگریزی میں رہ سکتے ہیں۔",
@@ -112,7 +112,7 @@ TRANSLATIONS = {
         "chat": "बातचीत", "admin": "एडमिन", "language": "भाषा", "english": "अंग्रेज़ी",
         "urdu": "उर्दू", "hindi": "हिंदी", "question": "अपना सवाल पूछें...", "send": "भेजें",
         "voice": "आवाज़ से पूछें", "speak": "जवाब बोलकर सुनाएँ", "categories": "श्रेणियाँ देखें",
-        "catalog": "1,000 प्रस्तावित मॉड्यूल देखें", "welcome": "नमस्ते! कोई श्रेणी चुनें या काम, पढ़ाई, स्वास्थ्य, यात्रा, पैसे और अन्य विषयों के बारे में पूछें।",
+        "catalog": "10,000 प्रस्तावित प्रॉम्प्ट देखें", "welcome": "नमस्ते! कोई श्रेणी चुनें या काम, पढ़ाई, स्वास्थ्य, यात्रा, पैसे और अन्य विषयों के बारे में पूछें।",
         "history": "बातचीत का इतिहास", "clear": "मेरा इतिहास मिटाएँ", "online": "ऑनलाइन अनुवाद",
         "privacy": "ऑनलाइन अनुवाद आपका सवाल और जवाब Google Cloud Translation को भेजता है।",
         "offline_note": "ऑफ़लाइन मोड में टेक्स्ट इसी कंप्यूटर पर रहता है; कुछ जवाब अंग्रेज़ी में हो सकते हैं।",
@@ -991,8 +991,8 @@ def render_admin():
         st.dataframe(storage.get_faq_rows(), width="stretch", hide_index=True)
 
     with tab_modules:
-        st.write("The catalog below contains 1,000 distinct topic/audience entries across 25 categories. It is a proposed index, not a claim that every topic has independently verified country-specific facts.")
-        st.download_button("Download all 1,000 proposed modules (CSV)", data=catalog_csv(), file_name="global_module_catalog_review.csv", mime="text/csv")
+        st.write("The catalog below contains 10,000 generated prompt templates across 25 categories (200 topics, five audiences, and ten action frameworks). It is a proposed index, not a claim that every topic has independently verified country-specific facts.")
+        st.download_button("Download all 10,000 prompt templates (CSV)", data=catalog_csv(), file_name="global_module_catalog_review.csv", mime="text/csv")
         selected = st.selectbox("Preview a category", list(CATEGORIES))
         selected_items = [item for item in build_catalog() if item["category"] == selected]
         st.dataframe(selected_items, width="stretch", hide_index=True)
@@ -1324,9 +1324,9 @@ with st.sidebar:
             if st.button(item["title"], key=f"module_{item['id']}", width="stretch"):
                 st.session_state.prompt_draft = item["question"]
     with st.expander(tr("catalog", language)):
-        st.write("Search and use 1,000 starter prompts across 25 practical categories. These are question templates, not separate integrations.")
+        st.write("Search and use 10,000 prompt templates across 25 practical categories. These are generated prompts, not separate integrations.")
         module_query = st.text_input(
-            "Search all 1,000 prompts",
+            "Search all 10,000 prompts",
             key="module_catalog_search",
             placeholder="Try scholarships, account security, or meal planning",
         )
@@ -1355,7 +1355,7 @@ with st.sidebar:
                     width="stretch",
                 ):
                     st.session_state.prompt_draft = item["question"]
-        st.download_button("Download all 1,000 prompts (CSV)", data=catalog_csv(), file_name="global_assistant_module_catalog.csv", mime="text/csv")
+        st.download_button("Download all 10,000 prompts (CSV)", data=catalog_csv(), file_name="global_assistant_module_catalog.csv", mime="text/csv")
     with st.expander("Security · Frontend · Backend"):
         st.write("Each category contains 100 generated checklist items.")
         for label, topics, key in (
