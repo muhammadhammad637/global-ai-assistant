@@ -146,30 +146,37 @@ CATEGORIES = {
     ],
 }
 
-AUDIENCES = (
-    "beginners",
-    "students",
-    "families",
-    "small businesses",
-    "newcomers",
+AUDIENCES = ("beginners", "students", "families", "small businesses", "newcomers")
+FRAMEWORKS = (
+    ("Practical Guide", "Practical Guide: {topic} for {audience}", "How can {audience} {topic}? Give a step-by-step practical guide."),
+    ("Strategic Roadmap", "Strategic Roadmap: {topic} for {audience}", "What roadmap should {audience} follow to {topic}? Include milestones and measures."),
+    ("Checklist", "Checklist: {topic} for {audience}", "Give {audience} a checklist for {topic}, including preparation and verification."),
+    ("Troubleshooting", "Troubleshooting: {topic} for {audience}", "What common problems arise when {audience} {topic}, and how can they address them?"),
+    ("Compare Options", "Compare Options: {topic} for {audience}", "Compare practical options for {audience} seeking to {topic}; explain trade-offs."),
+    ("Low-Budget Plan", "Low-Budget Plan: {topic} for {audience}", "How can {audience} {topic} affordably? Suggest realistic low-cost steps."),
+    ("30-Day Plan", "30-Day Plan: {topic} for {audience}", "Create a realistic 30-day action plan for {audience} to {topic}."),
+    ("Risk & Safety Review", "Risk and Safety Review: {topic} for {audience}", "What safety, privacy, or compliance checks should {audience} consider while they {topic}?"),
+    ("Resources Guide", "Resources Guide: {topic} for {audience}", "What reliable resources can help {audience} {topic}, and how should they evaluate them?"),
+    ("Progress Tracker", "Progress Tracker: {topic} for {audience}", "How should {audience} track progress when they {topic}? Suggest useful indicators."),
 )
 
 
 def build_catalog():
-    """Return 1,000 distinct topic/audience catalog entries."""
+    """Return 10,000 distinct topic, audience, and action-framework prompts."""
     catalog = []
     for category, topics in CATEGORIES.items():
         for topic in topics:
             for audience in AUDIENCES:
-                number = len(catalog) + 1
-                catalog.append({
-                    "id": f"module-{number:04d}",
-                    "category": category,
-                    "title": f"{topic.title()} for {audience.title()}",
-                    "question": f"How can {audience} {topic}?",
-                })
-    if len(catalog) != 1000:
-        raise ValueError(f"Expected 1,000 catalog entries, found {len(catalog)}")
+                for framework, title_template, question_template in FRAMEWORKS:
+                    number = len(catalog) + 1
+                    catalog.append({
+                        "id": f"module-{number:05d}",
+                        "category": category,
+                        "title": title_template.format(topic=topic.title(), audience=audience.title()),
+                        "question": question_template.format(topic=topic, audience=audience),
+                    })
+    if len(catalog) != 10000:
+        raise ValueError(f"Expected 10,000 catalog entries, found {len(catalog)}")
     return catalog
 
 
